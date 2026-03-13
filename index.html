@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0a1628">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Riego">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>Riego</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     VIEWS
+═══════════════════════════════════ -->
+
+<!-- VIEW: Home -->
+<div id="view-home" class="view active">
+  <header class="app-header">
+    <div class="header-left">
+      <div class="status-dot" id="status-dot"></div>
+      <span class="header-title">Riego</span>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn" id="btn-manual-quick" title="Riego manual">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v6M12 22v-6M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M22 12h-6M4.93 19.07l4.24-4.24M14.83 9.17l4.24-4.24"/></svg>
+      </button>
+      <button class="icon-btn" id="btn-add-program" title="Nuevo programa">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="home-content">
+    <div id="programs-list" class="programs-list"></div>
+    <div id="empty-state" class="empty-state hidden">
+      <div class="empty-icon">
+        <svg viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="1.5" opacity="0.3"/><path d="M20 36c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/><path d="M32 24v-8M28 20l4-4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/></svg>
+      </div>
+      <p class="empty-title">Sin programas</p>
+      <p class="empty-sub">Tocá <strong>+</strong> para crear tu primer programa de riego</p>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW: Program Detail / Edit -->
+<div id="view-program" class="view">
+  <header class="app-header">
+    <button class="icon-btn back-btn" id="btn-back-program">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+    </button>
+    <span class="header-title" id="program-view-title">Nuevo programa</span>
+    <button class="text-btn" id="btn-save-program">Guardar</button>
+  </header>
+
+  <div class="form-content">
+    <input type="hidden" id="edit-program-id" value="-1">
+
+    <div class="form-section">
+      <div class="form-row-space">
+        <span class="form-label-big">Activo</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="edit-enabled" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="time-picker-container">
+        <input type="time" id="edit-time" value="07:00" class="time-input">
+      </div>
+    </div>
+
+    <div class="form-section">
+      <p class="section-label">Días</p>
+      <div class="days-selector" id="days-selector">
+        <button class="day-btn" data-day="1">L</button>
+        <button class="day-btn" data-day="2">M</button>
+        <button class="day-btn" data-day="3">X</button>
+        <button class="day-btn" data-day="4">J</button>
+        <button class="day-btn" data-day="5">V</button>
+        <button class="day-btn" data-day="6">S</button>
+        <button class="day-btn" data-day="0">D</button>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <p class="section-label">Duración por zona <span class="section-hint">(0 = inactiva)</span></p>
+      <div class="zones-grid">
+        <div class="zone-item">
+          <label class="zone-label"><div class="zone-dot z1"></div>Zona 1</label>
+          <div class="zone-input-row">
+            <button class="zone-btn minus" data-zone="0">−</button>
+            <span class="zone-value" id="zone-val-0">0</span>
+            <input type="hidden" id="zone-input-0" value="0">
+            <button class="zone-btn plus" data-zone="0">+</button>
+            <span class="zone-unit">min</span>
+          </div>
+        </div>
+        <div class="zone-item">
+          <label class="zone-label"><div class="zone-dot z2"></div>Zona 2</label>
+          <div class="zone-input-row">
+            <button class="zone-btn minus" data-zone="1">−</button>
+            <span class="zone-value" id="zone-val-1">0</span>
+            <input type="hidden" id="zone-input-1" value="0">
+            <button class="zone-btn plus" data-zone="1">+</button>
+            <span class="zone-unit">min</span>
+          </div>
+        </div>
+        <div class="zone-item">
+          <label class="zone-label"><div class="zone-dot z3"></div>Zona 3</label>
+          <div class="zone-input-row">
+            <button class="zone-btn minus" data-zone="2">−</button>
+            <span class="zone-value" id="zone-val-2">0</span>
+            <input type="hidden" id="zone-input-2" value="0">
+            <button class="zone-btn plus" data-zone="2">+</button>
+            <span class="zone-unit">min</span>
+          </div>
+        </div>
+        <div class="zone-item">
+          <label class="zone-label"><div class="zone-dot z4"></div>Zona 4</label>
+          <div class="zone-input-row">
+            <button class="zone-btn minus" data-zone="3">−</button>
+            <span class="zone-value" id="zone-val-3">0</span>
+            <input type="hidden" id="zone-input-3" value="0">
+            <button class="zone-btn plus" data-zone="3">+</button>
+            <span class="zone-unit">min</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section" id="delete-section" style="display:none">
+      <button class="delete-btn" id="btn-delete-program">Eliminar programa</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW: Manual Irrigation -->
+<div id="view-manual" class="view">
+  <header class="app-header">
+    <button class="icon-btn back-btn" id="btn-back-manual">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+    </button>
+    <span class="header-title">Riego manual</span>
+    <div style="width:40px"></div>
+  </header>
+  <div class="form-content">
+    <div class="form-section">
+      <p class="section-label">Zona</p>
+      <div class="zone-selector-manual">
+        <button class="zone-sel-btn active" data-zone="1"><div class="zone-dot z1"></div><span>Zona 1</span></button>
+        <button class="zone-sel-btn" data-zone="2"><div class="zone-dot z2"></div><span>Zona 2</span></button>
+        <button class="zone-sel-btn" data-zone="3"><div class="zone-dot z3"></div><span>Zona 3</span></button>
+        <button class="zone-sel-btn" data-zone="4"><div class="zone-dot z4"></div><span>Zona 4</span></button>
+      </div>
+    </div>
+    <div class="form-section">
+      <p class="section-label">Duración</p>
+      <div class="duration-picker">
+        <button class="dur-preset" data-min="5">5 min</button>
+        <button class="dur-preset" data-min="10">10 min</button>
+        <button class="dur-preset" data-min="15">15 min</button>
+        <button class="dur-preset active" data-min="20">20 min</button>
+        <button class="dur-preset" data-min="30">30 min</button>
+        <button class="dur-preset" data-min="45">45 min</button>
+      </div>
+      <div class="custom-duration">
+        <span class="form-label-big">Personalizar</span>
+        <div class="zone-input-row">
+          <button class="zone-btn minus" id="dur-minus">−</button>
+          <span class="zone-value" id="dur-val">20</span>
+          <input type="hidden" id="manual-duration" value="20">
+          <button class="zone-btn plus" id="dur-plus">+</button>
+          <span class="zone-unit">min</span>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <button class="start-manual-btn" id="btn-start-manual">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M5 3l14 9-14 9V3z"/></svg>
+        Iniciar riego
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MINI PLAYER
+═══════════════════════════════════ -->
+<div id="mini-player" class="mini-player hidden">
+  <div class="mini-player-inner" id="mini-player-inner">
+    <div class="mini-info">
+      <div class="mini-anim">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <div class="mini-text">
+        <span class="mini-title" id="mini-title">Regando Zona 1</span>
+        <span class="mini-sub" id="mini-sub">Faltan 8 min</span>
+      </div>
+    </div>
+    <div class="mini-actions">
+      <button class="mini-btn" id="btn-pause-mini" title="Pausar/Reanudar">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+          <rect x="6" y="4" width="4" height="16" rx="1"/>
+          <rect x="14" y="4" width="4" height="16" rx="1"/>
+        </svg>
+      </button>
+      <button class="mini-btn mini-btn-stop" id="btn-stop-mini" title="Detener">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+          <rect x="5" y="5" width="14" height="14" rx="2"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     EXPANDED PLAYER
+═══════════════════════════════════ -->
+<div id="expanded-player" class="expanded-player hidden">
+  <div class="ep-bg"></div>
+  <div class="ep-content">
+    <button class="ep-close" id="btn-close-player">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <div class="ep-icon">
+      <div class="water-drops">
+        <div class="drop d1"></div>
+        <div class="drop d2"></div>
+        <div class="drop d3"></div>
+      </div>
+    </div>
+    <div class="ep-label" id="ep-label">RIEGO MANUAL</div>
+    <div class="ep-zone" id="ep-zone">Zona 1</div>
+    <div class="ep-progress-container">
+      <div class="ep-progress-bar">
+        <div class="ep-progress-fill" id="ep-progress-fill"></div>
+      </div>
+      <div class="ep-times">
+        <span id="ep-elapsed">0 min</span>
+        <span id="ep-remaining">— min</span>
+      </div>
+    </div>
+    <div class="ep-controls">
+      <button class="ep-btn ep-btn-pause" id="btn-pause-expanded">
+        <svg id="ep-pause-icon" viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
+          <rect x="6" y="4" width="4" height="16" rx="1"/>
+          <rect x="14" y="4" width="4" height="16" rx="1"/>
+        </svg>
+      </button>
+      <button class="ep-btn ep-btn-stop" id="btn-stop-expanded">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+        <span>Detener</span>
+      </button>
+    </div>
+    <div class="ep-zones-status" id="ep-zones-status"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     TOAST & MODAL
+═══════════════════════════════════ -->
+<div id="toast-container" class="toast-container"></div>
+
+<div id="modal-overlay" class="modal-overlay hidden">
+  <div class="modal">
+    <p class="modal-title" id="modal-title"></p>
+    <p class="modal-body" id="modal-body"></p>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" id="modal-cancel">Cancelar</button>
+      <button class="modal-btn confirm" id="modal-confirm">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- mqtt.min.js se carga como script clásico porque es un bundle UMD,
+     no un ES module. Debe ir antes del module entry point. -->
+<script src="mqtt.min.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
