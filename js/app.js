@@ -14,6 +14,7 @@ import {
   setOnlineStatus,
   renderProgramList,
   updateMiniPlayer,
+  updateManualView,
   updateExpandedPlayer,
   openExpandedPlayer,
   closeExpandedPlayer,
@@ -32,12 +33,6 @@ const state = {
   programs:  [],    // último riego/programs del ESP
   status:    null,  // último riego/status del ESP
   totalMins: 0,     // duración total de la zona en curso (para barra de progreso)
-};
-
-// Estado del formulario de riego manual
-const manualForm = {
-  zone:     1,
-  duration: 20,
 };
 
 // ── Arranque ─────────────────────────────────────────
@@ -67,6 +62,7 @@ function _initMQTTCallbacks() {
     state.status = msg;
     updateMiniPlayer(msg);
     updateExpandedPlayer(msg, state.programs, state.totalMins);
+    updateManualView(msg);
   };
 
   MQTTClient.on.programs = (msg) => {
@@ -142,10 +138,19 @@ function _handleDeleteProgram() {
   );
 }
 
-function _handleStartManual() {
+function _handleZoneToggle(zone, enabled) {
   if (!MQTTClient.isConnected()) { showToast('Sin conexión', 'error'); return; }
-  state.totalMins = manualForm.duration;
-  Irrigation.startManual(manualForm.zone, manualForm.duration);
+  if (enabled) {
+    Irrigation.startManual(zone);
+  } else {
+    // Solo apagar si esta zona es la activa
+    if (state.status?.mode === 'manual' && state.status?.zone === zone) {
+      Irrigation.stopManual();
+    } else {
+      // Zona ya inactiva — refrescar estado visual sin enviar comando
+      updateManualView(state.status);
+    }
+  }
 }
 
 function _handleStopIrrigation() {
@@ -192,36 +197,27 @@ function _initEventListeners() {
     });
   });
 
-  // Vista manual
+  // Vista manual — toggles por zona
   document.getElementById('btn-back-manual').addEventListener('click', navigateBack);
-  document.getElementById('btn-start-manual').addEventListener('click', _handleStartManual);
 
-  document.querySelectorAll('.zone-sel-btn').forEach(btn =>
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.zone-sel-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      manualForm.zone = parseInt(btn.dataset.zone);
-    })
-  );
+  for (let z = 1; z <= 4; z++) {
+    document.getElementById(`manual-toggle-${z}`).addEventListener('change', (e) => {
+      _handleZoneToggle(z, e.target.checked);
+    });
+  }
 
-  document.querySelectorAll('.dur-preset').forEach(btn =>
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.dur-preset').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      _setManualDuration(parseInt(btn.dataset.min));
-    })
-  );
+  document.getElementById('btn-stop-all').addEventListener('click', () => {
+    Irrigation.stopManual();
+  });
 
-  document.getElementById('dur-minus').addEventListener('click', () =>
-    _setManualDuration(Math.max(1, manualForm.duration - 1))
-  );
-  document.getElementById('dur-plus').addEventListener('click', () =>
-    _setManualDuration(Math.min(255, manualForm.duration + 1))
-  );
-
-  // Mini player
+  // Mini player — en manual abre la vista de zonas; en programa abre el player expandido
   document.getElementById('mini-player-inner').addEventListener('click', (e) => {
-    if (!e.target.closest('.mini-btn')) openExpandedPlayer();
+    if (e.target.closest('.mini-btn')) return;
+    if (state.status?.mode === 'manual') {
+      navigateTo('manual');
+    } else {
+      openExpandedPlayer();
+    }
   });
   document.getElementById('btn-pause-mini').addEventListener('click', (e) => {
     e.stopPropagation();
@@ -260,10 +256,4 @@ function _startOfflineWatchdog() {
   }, OFFLINE_CHECK_MS);
 }
 
-// ── Helper duración manual ───────────────────────────
 
-function _setManualDuration(val) {
-  manualForm.duration = val;
-  document.getElementById('dur-val').textContent   = val;
-  document.getElementById('manual-duration').value = val;
-}

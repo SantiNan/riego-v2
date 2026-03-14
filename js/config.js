@@ -33,6 +33,11 @@ export const MAX_PROGRAMS  = 32;   // slots de EEPROM
 export const MAX_ZONES     = 4;
 export const MAX_DURATION  = 255;  // minutos, uint8_t
 
+// ── Riego manual ─────────────────────────────────────
+// El firmware requiere 'minutes' en el comando manual/on.
+// Se usa 255 como workaround hasta que el firmware soporte duración ilimitada.
+// TODO: actualizar firmware para aceptar minutes=0 como sin límite.
+
 // ── Timeouts y polling ───────────────────────────────
 export const OFFLINE_TIMEOUT_S = 90;   // sin status → offline
 export const OFFLINE_CHECK_MS  = 15000;

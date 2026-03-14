@@ -153,46 +153,79 @@
     <span class="header-title">Riego manual</span>
     <div style="width:40px"></div>
   </header>
-  <div class="form-content">
-    <div class="form-section">
-      <p class="section-label">Zona</p>
-      <div class="zone-selector-manual">
-        <button class="zone-sel-btn active" data-zone="1"><div class="zone-dot z1"></div><span>Zona 1</span></button>
-        <button class="zone-sel-btn" data-zone="2"><div class="zone-dot z2"></div><span>Zona 2</span></button>
-        <button class="zone-sel-btn" data-zone="3"><div class="zone-dot z3"></div><span>Zona 3</span></button>
-        <button class="zone-sel-btn" data-zone="4"><div class="zone-dot z4"></div><span>Zona 4</span></button>
-      </div>
-    </div>
-    <div class="form-section">
-      <p class="section-label">Duración</p>
-      <div class="duration-picker">
-        <button class="dur-preset" data-min="5">5 min</button>
-        <button class="dur-preset" data-min="10">10 min</button>
-        <button class="dur-preset" data-min="15">15 min</button>
-        <button class="dur-preset active" data-min="20">20 min</button>
-        <button class="dur-preset" data-min="30">30 min</button>
-        <button class="dur-preset" data-min="45">45 min</button>
-      </div>
-      <div class="custom-duration">
-        <span class="form-label-big">Personalizar</span>
-        <div class="zone-input-row">
-          <button class="zone-btn minus" id="dur-minus">−</button>
-          <span class="zone-value" id="dur-val">20</span>
-          <input type="hidden" id="manual-duration" value="20">
-          <button class="zone-btn plus" id="dur-plus">+</button>
-          <span class="zone-unit">min</span>
+
+  <div id="manual-program-warning" class="manual-warning hidden">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+      <path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+    </svg>
+    <span>Activar una zona cancelará el programa en curso</span>
+  </div>
+
+  <div class="manual-zones-list" id="manual-zones-list">
+    <div class="manual-zone-row" id="manual-zone-row-1">
+      <div class="manual-zone-left">
+        <div class="manual-zone-icon z1"></div>
+        <div class="manual-zone-info">
+          <span class="manual-zone-name">Zona 1</span>
+          <span class="manual-zone-status" id="manual-zone-status-1">Apagada</span>
         </div>
       </div>
+      <label class="toggle-switch" onclick="event.stopPropagation()">
+        <input type="checkbox" id="manual-toggle-1" data-zone="1">
+        <span class="slider"></span>
+      </label>
     </div>
-    <div class="form-section">
-      <button class="start-manual-btn" id="btn-start-manual">
-        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M5 3l14 9-14 9V3z"/></svg>
-        Iniciar riego
-      </button>
+
+    <div class="manual-zone-row" id="manual-zone-row-2">
+      <div class="manual-zone-left">
+        <div class="manual-zone-icon z2"></div>
+        <div class="manual-zone-info">
+          <span class="manual-zone-name">Zona 2</span>
+          <span class="manual-zone-status" id="manual-zone-status-2">Apagada</span>
+        </div>
+      </div>
+      <label class="toggle-switch" onclick="event.stopPropagation()">
+        <input type="checkbox" id="manual-toggle-2" data-zone="2">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="manual-zone-row" id="manual-zone-row-3">
+      <div class="manual-zone-left">
+        <div class="manual-zone-icon z3"></div>
+        <div class="manual-zone-info">
+          <span class="manual-zone-name">Zona 3</span>
+          <span class="manual-zone-status" id="manual-zone-status-3">Apagada</span>
+        </div>
+      </div>
+      <label class="toggle-switch" onclick="event.stopPropagation()">
+        <input type="checkbox" id="manual-toggle-3" data-zone="3">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="manual-zone-row" id="manual-zone-row-4">
+      <div class="manual-zone-left">
+        <div class="manual-zone-icon z4"></div>
+        <div class="manual-zone-info">
+          <span class="manual-zone-name">Zona 4</span>
+          <span class="manual-zone-status" id="manual-zone-status-4">Apagada</span>
+        </div>
+      </div>
+      <label class="toggle-switch" onclick="event.stopPropagation()">
+        <input type="checkbox" id="manual-toggle-4" data-zone="4">
+        <span class="slider"></span>
+      </label>
     </div>
   </div>
-</div>
 
+  <div class="manual-footer">
+    <button class="stop-all-btn hidden" id="btn-stop-all">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+      Apagar todo
+    </button>
+  </div>
+</div>
 <!-- ══════════════════════════════════
      MINI PLAYER
 ═══════════════════════════════════ -->

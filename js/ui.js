@@ -91,10 +91,10 @@ function _buildProgramCard(prog, status, { onToggle, onEdit }) {
 // ── Mini player ──────────────────────────────────────
 
 export function updateMiniPlayer(status) {
-  const mp         = document.getElementById('mini-player');
-  const miniTitle  = document.getElementById('mini-title');
-  const miniSub    = document.getElementById('mini-sub');
-  const pauseBtn   = document.getElementById('btn-pause-mini');
+  const mp        = document.getElementById('mini-player');
+  const miniTitle = document.getElementById('mini-title');
+  const miniSub   = document.getElementById('mini-sub');
+  const pauseBtn  = document.getElementById('btn-pause-mini');
 
   if (!status || status.mode === 'idle') {
     mp.classList.add('hidden');
@@ -106,12 +106,53 @@ export function updateMiniPlayer(status) {
   const isPaused = status.mode === 'paused';
   mp.classList.toggle('paused', isPaused);
 
-  pauseBtn.innerHTML = isPaused ? _iconPlay(22) : _iconPause(22);
+  // Pausa solo disponible en modo programa; en manual se oculta
+  const isManual = status.mode === 'manual';
+  pauseBtn.style.display = isManual ? 'none' : 'flex';
+  if (!isManual) pauseBtn.innerHTML = isPaused ? _iconPlay(22) : _iconPause(22);
 
   miniTitle.textContent = _irrigationTitle(status);
-  miniSub.textContent   = status.remaining != null
-    ? `${status.remaining} min restante${status.remaining !== 1 ? 's' : ''}`
-    : '';
+  // En modo manual no se muestra tiempo restante (riego sin límite)
+  miniSub.textContent = status.mode === 'manual'
+    ? ''
+    : (status.remaining != null
+        ? `${status.remaining} min restante${status.remaining !== 1 ? 's' : ''}`
+        : '');
+}
+
+// ── Manual zone view ─────────────────────────────────
+
+/**
+ * Sincroniza el estado de la vista manual con el status del ESP.
+ * @param {object|null} status - último riego/status, o null
+ */
+export function updateManualView(status) {
+  const activeZone = (status?.mode === 'manual') ? status.zone : null;
+
+  for (let z = 1; z <= 4; z++) {
+    const row      = document.getElementById(`manual-zone-row-${z}`);
+    const toggle   = document.getElementById(`manual-toggle-${z}`);
+    const statusEl = document.getElementById(`manual-zone-status-${z}`);
+    const isActive = activeZone === z;
+
+    row.classList.toggle('zone-active', isActive);
+    toggle.checked = isActive;
+
+    if (isActive) {
+      statusEl.textContent = 'Regando';
+    } else {
+      statusEl.textContent = 'Apagada';
+    }
+  }
+
+  // Botón "Apagar todo"
+  const stopAll = document.getElementById('btn-stop-all');
+  stopAll.classList.toggle('hidden', !activeZone);
+
+  // Warning si hay programa activo
+  const warning = document.getElementById('manual-program-warning');
+  const progRunning = status?.mode === 'program' || status?.mode === 'paused';
+  warning.classList.toggle('hidden', !progRunning);
 }
 
 // ── Expanded player ──────────────────────────────────

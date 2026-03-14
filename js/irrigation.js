@@ -12,14 +12,14 @@ import { publish, isConnected } from './mqtt.js';
 // ── Comandos de riego manual ─────────────────────────
 
 /**
- * Inicia riego manual en una zona.
- * @param {number} zone     - Zona 1-4 (1-based, igual que el protocolo)
- * @param {number} minutes  - Duración 1-255
+ * Inicia riego manual en una zona sin límite de tiempo.
+ * El riego corre hasta recibir manual/off.
+ * @param {number} zone - Zona 1-4 (1-based, igual que el protocolo)
  * @returns {boolean} false si no hay conexión
  */
-export function startManual(zone, minutes) {
+export function startManual(zone) {
   if (!isConnected()) return false;
-  publish(TOPICS.cmdManual, { action: 'on', zone, minutes });
+  publish(TOPICS.cmdManual, { action: 'on', zone });
   return true;
 }
 
